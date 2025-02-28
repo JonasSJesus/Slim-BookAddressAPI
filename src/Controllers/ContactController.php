@@ -17,8 +17,9 @@ class ContactController
 
 
 
-     public function read(Request $request, Response $response)#: Response
+     public function read(Request $request, Response $response): Response
      {
+          // Busca dados do banco de dados. Se não vier nada, retorna um 404
           $dbData = $this->contactRepository->read();
           if ($dbData == null) {
                $body = [
@@ -32,6 +33,7 @@ class ContactController
                     ->withStatus(404);
           }
      
+          // escrevendo no corpo da requisição a o payload, que são os dados do banco
           $payload = json_encode($dbData);          
 
           $response->getBody()->write($payload);

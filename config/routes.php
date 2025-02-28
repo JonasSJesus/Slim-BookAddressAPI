@@ -6,6 +6,6 @@ use Agenda\Controllers\ContactController;
 
 return function (App $app) 
 {
-     $app->get('/', [ContactController::class, 'read']);
-     $app->post('/', [ContactController::class, 'create']);
+     $app->get('/contacts', [ContactController::class, 'read']);
+     $app->post('/contacts', [ContactController::class, 'create']);
 };

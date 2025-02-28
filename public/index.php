@@ -13,7 +13,6 @@ $containerBuilder = new ContainerBuilder();
 $dependencies = require_once __DIR__ . '/../config/dependencies.php';
 $dependencies($containerBuilder);
 
-
 $container = $containerBuilder->build();
 
 
