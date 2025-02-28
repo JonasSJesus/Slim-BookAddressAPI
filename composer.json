@@ -1,0 +1,13 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Agenda\\": "src/"
+        }
+    },
+    "require": {
+        "slim/slim": "^4.14",
+        "slim/psr7": "^1.7",
+        "php-di/php-di": "^7.0",
+        "symfony/var-dumper": "^7.2"
+    }
+}
