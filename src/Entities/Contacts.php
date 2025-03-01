@@ -4,7 +4,7 @@ namespace Agenda\Entities;
 
 class Contacts
 {
-     public readonly int $id;
+     private int $id;
      public readonly string $name;
      public readonly int $phone_number;
      public readonly string $email;

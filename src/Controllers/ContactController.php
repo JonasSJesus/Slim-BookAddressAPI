@@ -6,10 +6,12 @@ use Agenda\Entities\Contacts;
 use Agenda\Repositories\ContactRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 class ContactController
 {
      private ContactRepository $contactRepository;
+     ////private ContactService $contactService;
      
      public function __construct(ContactRepository $contactRepository) {
           $this->contactRepository = $contactRepository;
@@ -60,7 +62,7 @@ class ContactController
 
           $contact = $this->createObject($contactData);
           
-          // Salvando no Banco de Dados. Se não salvar, cai no bloco IF
+          // Salvando no Banco de Dados. Se não conseguir salvar, cai no bloco IF
           $saveToDB = $this->contactRepository->create($contact);
 
           if (!$saveToDB) { 
@@ -75,6 +77,31 @@ class ContactController
           return $response
                ->withHeader('Content-Type', 'application/json')
                ->withStatus(201);
+     }
+
+     public function update(Request $request, Response $response): Response
+     {
+          $request = $request->getBody()->getContents();
+          $dataRequest = json_decode($request, true);
+          
+          if(!$this->validateDataFromRequest($dataRequest)){
+               $payload = json_encode([
+                    "Error" => "Dados invalidos"
+               ]);
+               $response->getBody()->write($payload);
+
+               return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(400);
+          }
+
+          $contact = $this->createObject($dataRequest);
+          
+          var_dump($contact);
+
+
+
+          return $response;
      }
 
 

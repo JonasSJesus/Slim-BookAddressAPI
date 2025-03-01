@@ -10,7 +10,7 @@ return function (ContainerBuilder $containerBuilder)
           "db.dsn" => 'sqlite:' . __DIR__ . '/../banco.sqlite',
 
           PDO::class => function (ContainerInterface $c) {
-                    $dsn = $c->get('db.dsn');
+                    $dsn = $c->get('db.dsn'); 
                     
                     return new PDO($dsn);
                }

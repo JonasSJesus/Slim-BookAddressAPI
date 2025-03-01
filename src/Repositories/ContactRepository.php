@@ -53,15 +53,30 @@ class ContactRepository
      }
 
 
-     public function update(Contacts $contacts)
+     public function update(Contacts $contacts): bool
      {
-          
+          $stmt = $this->pdo->prepare(
+               'UPDATE contacts SET name = :name, phone_number = :phone_number, email = :email, address = :address WHERE id = :id;'
+          );
+          $stmt->bindValue(':name', $contacts->name);
+          $stmt->bindValue(':phone_number', $contacts->phone_number);
+          $stmt->bindValue(':email', $contacts->email);
+          $stmt->bindValue(':address', $contacts->address);
+          $stmt->bindValue(':id', $contacts->getId());
+
+          return $stmt->execute();
+
      }
 
-
-
-
-
+     public function delete(int $id)
+     {
+          $stmt = $this->pdo->prepare(
+               'DELETE FROM contacts WHERE id = :id;'
+          );
+          $stmt->bindValue(':id', $id);
+          
+          return $stmt->execute();
+     }
 
      private function hydrate(array $data): Contacts
      {
