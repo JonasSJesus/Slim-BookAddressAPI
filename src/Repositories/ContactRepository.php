@@ -33,18 +33,43 @@ class ContactRepository
           return $stmt->execute();
      }
 
+
      /**
       * Retorna um array com todos os contatos do banco de dados 
       * @return array
+      * @param bool $associative Quando `true`, retorna um array associativo; Quando `false`, retorna um objeto. Default = true
       */
-     public function read(): array|null
+     public function read(bool $associative = true): array|null
      {
           $stmt = $this->pdo->query(
                'SELECT * FROM contacts;'
           );
-          $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-          #$dataFormated = array_map($this->hydrate(...), $data);
 
+          $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          if (empty($data)){
+               return null;
+          }
+          
+          if ($associative === true){
+               return $data;
+          }else{
+               $dataAsObj = array_map($this->hydrate(...), $data);
+               return $dataAsObj;
+          }
+     }
+
+
+
+     public function readById(int $id, bool $associative = true): Contacts|array|null
+     {
+          $stmt = $this->pdo->prepare(
+               'SELECT * FROM contacts WHERE id = :id;'
+          );
+          $stmt->bindValue(':id', $id);
+          $stmt->execute();
+
+          $data = $stmt->fetch(PDO::FETCH_ASSOC);
+          
           if (empty($data)){
                return null;
           }
@@ -53,6 +78,11 @@ class ContactRepository
      }
 
 
+     /**
+      * Summary of update
+      * @param \Agenda\Entities\Contacts $contacts
+      * @return bool
+      */
      public function update(Contacts $contacts): bool
      {
           $stmt = $this->pdo->prepare(
@@ -68,6 +98,12 @@ class ContactRepository
 
      }
 
+
+     /**
+      * Summary of delete
+      * @param int $id
+      * @return bool
+      */
      public function delete(int $id)
      {
           $stmt = $this->pdo->prepare(
@@ -78,6 +114,13 @@ class ContactRepository
           return $stmt->execute();
      }
 
+
+
+     /**
+      * Summary of hydrate
+      * @param array $data
+      * @return Contacts
+      */
      private function hydrate(array $data): Contacts
      {
           $contact = new Contacts($data['name'], $data['phone_number'], $data['email'], $data['address']);
