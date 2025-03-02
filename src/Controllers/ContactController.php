@@ -75,7 +75,6 @@ class ContactController
                     ->withStatus(400);
           }
 
-          
           $contact = $this->createObject($contactData);
           
           // Salvando no Banco de Dados.
@@ -132,13 +131,11 @@ class ContactController
                     ->withStatus(404);
           }
 
-
           $id = (int) $args['id'];
           
           $contact = $this->createObject($dataRequest);
           $contact->setId($id);
-          
-          
+                    
           $updateInDb = $this->contactRepository->update($contact);
 
           if(!$updateInDb) {
@@ -150,7 +147,6 @@ class ContactController
                     ->withStatus(503);
           }
 
-
           $payload = json_encode(['Success' => 'Contato Atualizado com sucesso!']);
           $response->getBody()->write($payload);
           return $response
@@ -158,6 +154,7 @@ class ContactController
                ->withStatus(200);
      }
 
+     
 
      public function readOne(Request $request, Response $response, array $args): Response
      {
@@ -171,7 +168,6 @@ class ContactController
           }
           $id = $args['id'];
           
-
           $contactData = $this->contactRepository->readById($id);
           if ($contactData == null) {
                $payload = json_encode(['Error' => 'Contato não encontrado']);
@@ -181,7 +177,6 @@ class ContactController
                     ->withHeader('Content-Type', 'application/json')
                     ->withStatus(503);
           }
-
 
           $payload = json_encode($contactData);
 
