@@ -46,8 +46,8 @@ class ContactController
             $payload = json_encode($dbData);
             $response->getBody()->write($payload);
             return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
         }
         
         
@@ -71,8 +71,8 @@ class ContactController
                 // Manipulando a Resposta
                 $response->getBody()->write($payload);
                 return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(400);
             }
             
             $contact = $this->createObject($contactData);
@@ -86,13 +86,13 @@ class ContactController
                 
                 $response->getBody()->write($payload);
                 return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(503);
             }
             
             return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(201);
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(201);
         }
         
         
@@ -115,8 +115,8 @@ class ContactController
                 $response->getBody()->write($payload);
                 
                 return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(400);
             }
             
             // Verifica se o valor de {id} inserido na url (e recuperado com $args) é um inteiro
@@ -127,8 +127,8 @@ class ContactController
                 $response->getBody()->write($payload);
                 
                 return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(404);
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(404);
             }
             
             $id = (int) $args['id'];
@@ -143,15 +143,15 @@ class ContactController
                 
                 $response->getBody()->write($payload);
                 return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(503);
             }
             
             $payload = json_encode(['Success' => 'Contato Atualizado com sucesso!']);
             $response->getBody()->write($payload);
             return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
         }
         
         
@@ -163,8 +163,8 @@ class ContactController
                 
                 $response->getBody()->write($payload);
                 return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(503);
             }
             $id = $args['id'];
             
@@ -174,16 +174,27 @@ class ContactController
                 
                 $response->getBody()->write($payload);
                 return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(503);
             }
             
             $payload = json_encode($contactData);
             
             $response->getBody()->write($payload);
             return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
+        }
+
+
+
+        public function delete(Request $request, Response $response, array $args): Response
+        {
+            $id = $args['id'];
+
+            $deleteOnDB = $this->contactRepository->delete($id);
+
+            return $response->withStatus(200);
         }
         
         //=======================================|Helpers|===========================================//
