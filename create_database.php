@@ -4,7 +4,7 @@ $dbPath = __DIR__ . '/banco.sqlite';
 $pdo = new PDO("sqlite:$dbPath");
 
 $pdo->exec(
-     "CREATE TABLE users (
+	"CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
