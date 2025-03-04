@@ -80,7 +80,7 @@ class ContactController
                 ->withStatus(400);
         }
         
-        $contactOBJ = $this->createObject($contactData['contact']);
+        $contactOBJ = $this->hydrate($contactData['contact']);
         
         // Salvando no Banco de Dados.
         $saveToDB = $this->contactRepository->create($contactOBJ);
@@ -139,7 +139,7 @@ class ContactController
         
         $id = (int) $args['id'];
         
-        $contact = $this->createObject($dataRequest);
+        $contact = $this->hydrate($dataRequest);
         $contact->setId($id);
         
         $updateInDb = $this->contactRepository->update($contact);
@@ -162,6 +162,14 @@ class ContactController
     
     
     
+    /**
+     * Recupera um dado do banco com base no id passado na url (/contacts/{id})
+     * ! Pode ser colocado na camada de services ou em traits helper
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $args
+     * @return Response
+     */
     private function readOne(Request $request, Response $response, array $args): Response
     {
         if(!$this->validateIntAndReturnResponse($args['id'])){
@@ -194,6 +202,13 @@ class ContactController
 
 
 
+    /**
+     * Deleta Contatos com base no {id}
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $args 
+     * @return Response
+     */
     public function delete(Request $request, Response $response, array $args): Response
     {
         
@@ -263,7 +278,7 @@ class ContactController
         return filter_var($args, FILTER_VALIDATE_INT);
     }
     
-    private function createObject(array $contactsRequest): Contacts
+    private function hydrate(array $contactsRequest): Contacts
     {
         return new Contacts(
             $contactsRequest['name'],
