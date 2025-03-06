@@ -2,20 +2,24 @@
 
 use Slim\App;
 use Agenda\Controllers\ContactController;
+use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
 
 return function(App $app) 
 {
-    // GET
-    $app->get('/[{id}]', [ContactController::class, 'read']);
-    #$app->get('/{id}', [ContactController::class, 'readOne']);
-    
-    // POST
-    $app->post('/', [ContactController::class, 'create']);
-    
-    // PUT
-    $app->put('/{id}', [ContactController::class, 'update']);
-    
-    // DELETE
-    $app->delete('/{id}', [ContactController::class, 'delete']);
+    $app->group('/contacts', function (Group $group) {
+        // GET
+        $group->get('', [ContactController::class, 'read']);
+        $group->get('/{id}', [ContactController::class, 'readOne']);
+        
+        // POST
+        $group->post('', [ContactController::class, 'create']);
+        
+        // PUT
+        $group->put('/{id}', [ContactController::class, 'update']);
+        
+        // DELETE
+        $group->delete('/{id}', [ContactController::class, 'delete']);
+
+    });
 };

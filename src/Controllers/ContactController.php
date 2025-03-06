@@ -3,14 +3,17 @@
 namespace Agenda\Controllers;
 
 use Agenda\Entities\Contacts;
+use Agenda\Services\ContactService;
+use Agenda\Controllers\BaseController;
 use Agenda\Repositories\ContactRepository;
+use Agenda\Controllers\ControllerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class ContactController
+class ContactController extends BaseController implements ControllerInterface
 {
     private ContactRepository $contactRepository;
-    ////private ContactService $contactService;
+    // ? private ContactService $contactService;
     
     public function __construct(ContactRepository $contactRepository) {
         $this->contactRepository = $contactRepository;
@@ -25,34 +28,48 @@ class ContactController
     * @return Response
     */
     public function read(Request $request, Response $response, array $args): Response
-    {
-        // ? Como estamos passando o id de forma dinamica nas rotas podemos retornar apenas um contato no mesmo controller.
-        // ! Se eu mudar de ideia depois é só tirar o bloco if e chamar o método readOne diretamente nas rotas, como era feito antes.
-        if (array_key_exists('id', $args)) {
-            $response = $this->readOne($request, $response, $args);
-            return $response;
-        }
-        
+    {   
         // Busca dados do banco de dados. Se não vier nada, retorna um 404
         $dbData = $this->contactRepository->read(true);
-        
-        
+
         if ($dbData == null) {
-            $payload = json_encode([
-                "error" => "nenhum dado encontrado!"
-            ]);
-            
-            $response->getBody()->write($payload);                                // Escreve o payload json no corpo da resposta
-            return $response                                                              // Retorna a resposta com as modificações definidas abaixo:
-                ->withHeader('Content-Type', 'application/json')               // Define o tipo de retorno para json
-                ->withStatus(404); ;                                                  // Define o status-code do retorno
+            $payload = ["error" => "nenhum dado encontrado!"];
+            return $this->jsonResponse($response, $payload, 404);
         }
-            
         
-        // Transforma o retorno do banco em JSON, escreve no corpo da resposta e retorna a resposta
-        $payload = json_encode($dbData);
-        $response->getBody()->write($payload);
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        
+        // Transforma o retorno do banco em JSON, escreve no corpo da resposta e retorna a resposta com o status code
+        return $this->jsonResponse($response, $dbData);
+    }
+    
+    
+    
+    /**
+     * Recupera um dado do banco com base no id passado na url (/contacts/{id})
+     * ! Pode ser colocado na camada de services ou em traits helper
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $args
+     * @return Response
+     */
+    public function readOne(Request $request, Response $response, array $args): Response
+    {
+        if(!$this->validateIntAndReturnResponse($args['id'])){
+            $payload = ['Error' => 'Contato não encontrado'];
+
+            return $this->jsonResponse($response, $payload, 404);
+        }
+
+        $id = $args['id'];
+        
+        $contactData = $this->contactRepository->readById($id);
+        if ($contactData == null) {
+            $payload = ['Error' => 'Contato não encontrado'];
+            
+            return $this->jsonResponse($response, $payload, 404);
+        }
+
+        return $this->jsonResponse($response, $contactData);
     }
         
         
@@ -71,13 +88,9 @@ class ContactController
         
         // Validações de dados
         if (!$this->validateDataFromRequest($contactData['contact'])){
-            $payload = json_encode(['Error' => 'Dados invalidos']); 
+            $payload = ['Error' => 'Dados invalidos']; 
             
-            // Manipulando a Resposta
-            $response->getBody()->write($payload);
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+            return $this->jsonResponse($response, $payload, 400);
         }
         
         $contactOBJ = $this->hydrate($contactData['contact']);
@@ -87,17 +100,13 @@ class ContactController
         
         // Se não conseguir salvar, cai no bloco IF
         if (!$saveToDB) { 
-            $payload = json_encode(['Error' => 'Erro ao salvar dados']);
+            $payload = ['Error' => 'Erro ao salvar dados'];
             
-            $response->getBody()->write($payload);
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+            return $this->jsonResponse($response, $payload, 503);
         }
-        
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(201);
+
+        $payload = ["Success" => "Contato adicionado com sucesso!"];
+        return $this->jsonResponse($response, $payload, 201);
     }
     
     
@@ -115,26 +124,16 @@ class ContactController
         
         // Valida os dados da requisição, se não estiverem com o formato aceito, retorna um erro
         if(!$this->validateDataFromRequest($dataRequest)){
-            $payload = json_encode([
-                "Error" => "Dados invalidos"
-            ]);
-            $response->getBody()->write($payload);
-            
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+            $payload = ["Error" => "Dados invalidos"];
+
+            return $this->jsonResponse($response, $payload, 400);
         }
         
         // Verifica se o valor de {id} inserido na url (e recuperado com $args) é um inteiro
         if (!$this->validateIntAndReturnResponse($args['id'])){
-            $payload = json_encode([
-                "Error" => "Usuario não encontrado"
-            ]);
-            $response->getBody()->write($payload);
-            
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(404);
+            $payload = ["Error" => "Usuario não encontrado"];
+
+            return $this->jsonResponse($response, $payload, 404);
         }
         
         $id = (int) $args['id'];
@@ -145,63 +144,17 @@ class ContactController
         $updateInDb = $this->contactRepository->update($contact);
         
         if(!$updateInDb) {
-            $payload = json_encode(['Error' => 'Erro ao atualizar dados']);
+            $payload = ['Error' => 'Erro ao atualizar dados'];
             
-            $response->getBody()->write($payload);
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+            return $this->jsonResponse($response, $payload, 503);
         }
         
-        $payload = json_encode(['Success' => 'Contato Atualizado com sucesso!']);
-        $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
-    }
-    
-    
-    
-    /**
-     * Recupera um dado do banco com base no id passado na url (/contacts/{id})
-     * ! Pode ser colocado na camada de services ou em traits helper
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param array $args
-     * @return Response
-     */
-    private function readOne(Request $request, Response $response, array $args): Response
-    {
-        if(!$this->validateIntAndReturnResponse($args['id'])){
-            $payload = json_encode(['Error' => 'Contato não encontrado']);
-            
-            $response->getBody()->write($payload);
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(404);
-        }
-        $id = $args['id'];
-        
-        $contactData = $this->contactRepository->readById($id);
-        if ($contactData == null) {
-            $payload = json_encode(['Error' => 'Contato não encontrado']);
-            
-            $response->getBody()->write($payload);
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(404);
-        }
-        
-        $payload = json_encode($contactData);
-        
-        $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+        $payload = ['Success' => 'Contato Atualizado com sucesso!'];
+        return $this->jsonResponse($response, $payload);
     }
 
 
-
+    
     /**
      * Deleta Contatos com base no {id}
      * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -211,34 +164,24 @@ class ContactController
      */
     public function delete(Request $request, Response $response, array $args): Response
     {
-        
         if (!$this->validateIntAndReturnResponse($args['id'])) {
-            $payload = json_encode(['Error' => 'Contato não encontrado']);
+            $payload = ['Error' => 'Contato não encontrado'];
             
-            $response->getBody()->write($payload);
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+            return $this->jsonResponse($response, $payload, 503);
         }
+
         $id = (int) $args['id'];
-        
 
         $deleteOnDB = $this->contactRepository->delete($id);
 
         if (!$deleteOnDB) {
-            $payload = json_encode(['Error' => 'Erro ao Deletar Contato']);
-            
-            $response->getBody()->write($payload);
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(503);
+            $payload =['Error' => 'Erro ao Deletar Contato'];
+
+            return $this->jsonResponse($response, $payload, 404);
         }
 
-        $payload = json_encode(['Success' => 'Contato Deletado com sucesso!']);
-        $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+        $payload = ['Success' => 'Contato Deletado com sucesso!'];
+        return $this->jsonResponse($response, $payload);
     }
     
     //=======================================|Helpers|===========================================//

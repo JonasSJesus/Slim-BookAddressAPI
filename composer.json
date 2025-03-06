@@ -9,5 +9,8 @@
         "slim/psr7": "^1.7",
         "php-di/php-di": "^7.0",
         "symfony/var-dumper": "^7.2"
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t public"
     }
 }
