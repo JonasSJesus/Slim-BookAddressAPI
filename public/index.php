@@ -15,10 +15,11 @@ $dependencies($containerBuilder);
 
 $container = $containerBuilder->build();
 
-
 // Informando o DIcontainer e Iniciando o App 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
+
+$app->addBodyParsingMiddleware();
 
 // Definindo Rotas
 $routes = require_once __DIR__ . '/../config/routes.php';

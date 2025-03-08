@@ -27,7 +27,7 @@ class ContactController extends BaseController implements ControllerInterface
     * @param \Psr\Http\Message\ResponseInterface $response
     * @return Response
     */
-    public function read(Request $request, Response $response, array $args): Response
+    public function read(Request $request, Response $response): Response
     {   
         // Busca dados do banco de dados. Se não vier nada, retorna um 404
         $dbData = $this->contactRepository->read(true);
@@ -45,8 +45,10 @@ class ContactController extends BaseController implements ControllerInterface
     
     
     /**
+     * 
      * Recupera um dado do banco com base no id passado na url (/contacts/{id})
      * ! Pode ser colocado na camada de services ou em traits helper
+     * 
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param array $args
@@ -76,13 +78,13 @@ class ContactController extends BaseController implements ControllerInterface
 
     /**
     * Controlador para inserir dados do banco
+
     * @param \Psr\Http\Message\ServerRequestInterface $request
     * @param \Psr\Http\Message\ResponseInterface $response
     * @return Response
     */
     public function create(Request $request, Response $response): Response
     {
-        
         $request = $request->getBody()->getContents();                   // Capturando arquivo JSON da Stream de input (php://input)
         $contactData = json_decode($request, true);   // Pega a requisicao e transforma em array assoc
         
@@ -113,6 +115,7 @@ class ContactController extends BaseController implements ControllerInterface
 
     /**
     * Controlador para atualizar dados do banco
+    
     * @param \Psr\Http\Message\ServerRequestInterface $request
     * @param \Psr\Http\Message\ResponseInterface $response
     * @return Response
