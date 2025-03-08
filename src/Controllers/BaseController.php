@@ -4,8 +4,22 @@ namespace Agenda\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 
-abstract class BaseController
+
+/**
+ * Base para todos os controllers 
+ */
+abstract class BaseController implements ControllerInterface
 {
+
+    /**
+     * Cria a resposta adequada, encodando os dados para json e inserindo no corpo da resposta.
+     * Também passa o status code e o Content-Type (apesar de configurar no middleware)
+     * 
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $payload
+     * @param int $status
+     * @return Response
+     */
     protected function jsonResponse(Response $response, array $payload = [], int $status = 200): Response
     {
         if($payload){

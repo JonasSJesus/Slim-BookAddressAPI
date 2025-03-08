@@ -1,9 +1,8 @@
 <?php
 
-use Agenda\Middlewares\SimpleMiddleware;
 use Slim\App;
 use Agenda\Controllers\TestController;
-use Agenda\Controllers\ContactController;
+use Agenda\Controllers\Contacts\ContactController;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
 
@@ -23,10 +22,10 @@ return function(App $app)
         // DELETE
         $group->delete('/{id}', [ContactController::class, 'delete']);
 
-    })->add(new SimpleMiddleware());
+    });
 
 
-    //==========================|Rotas de test|=====================================//
-    $app->get('/test', [TestController::class, 'test'])->add(new SimpleMiddleware());
+    //==========================|Rotas de teste|=====================================//
+    $app->get('/test', [TestController::class, 'test']);
     $app->post('/test', [TestController::class, 'add']);
 };

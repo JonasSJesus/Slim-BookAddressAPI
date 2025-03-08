@@ -1,6 +1,6 @@
 <?php
 
-namespace Agenda\Controllers;
+namespace Agenda\Controllers\Contacts;
 
 use Agenda\Entities\Contacts;
 use Agenda\Services\ContactService;
@@ -10,7 +10,7 @@ use Agenda\Controllers\ControllerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class ContactController extends BaseController implements ControllerInterface
+class ContactController extends BaseController 
 {
     private ContactRepository $contactRepository;
     // ? private ContactService $contactService;

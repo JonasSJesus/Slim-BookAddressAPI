@@ -7,8 +7,15 @@ class TestController
 {
     public function test(Request $request, Response $response): Response
     {
-        var_dump($request->getParsedBody());
+        $data = [
+            "id" => "1",
+            "name" => "User Test",
+            "email" => "test@email.com"
+        ];
+
+        $jsonEncoded = json_encode($data);
         
+        $response->getBody()->write($jsonEncoded);
         return $response;
     }
 

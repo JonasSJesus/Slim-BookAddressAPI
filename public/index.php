@@ -2,7 +2,6 @@
 
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
-use Agenda\Controllers\ContactController;
 
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -19,7 +18,15 @@ $container = $containerBuilder->build();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
+$app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
+
+// Definindo os Middlewares Globais
+$middlewares = require_once __DIR__ . '/../config/middlewares.php';
+$middlewares($app);
+
+// Middleware de tratamento de erros
+$errorMiddleware = $app->addErrorMiddleware(false, true, true);
 
 // Definindo Rotas
 $routes = require_once __DIR__ . '/../config/routes.php';

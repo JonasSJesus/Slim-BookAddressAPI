@@ -1,7 +1,7 @@
 <?php
 
 use PDO;
-use Agenda\Controllers\ContactController;
+use Agenda\Controllers\Contacts\ContactController;
 use Agenda\Repositories\ContactRepository;
 
 require_once __DIR__ . '/../vendor/autoload.php';
