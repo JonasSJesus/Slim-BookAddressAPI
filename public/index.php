@@ -26,7 +26,7 @@ $middlewares = require_once __DIR__ . '/../config/middlewares.php';
 $middlewares($app);
 
 // Middleware de tratamento de erros
-$errorMiddleware = $app->addErrorMiddleware(false, true, true);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 // Definindo Rotas
 $routes = require_once __DIR__ . '/../config/routes.php';

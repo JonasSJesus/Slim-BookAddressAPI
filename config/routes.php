@@ -26,6 +26,4 @@ return function(App $app)
 
 
     //==========================|Rotas de teste|=====================================//
-    $app->get('/test', [TestController::class, 'test']);
-    $app->post('/test', [TestController::class, 'add']);
 };

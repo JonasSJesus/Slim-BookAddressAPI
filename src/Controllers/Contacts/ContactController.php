@@ -13,7 +13,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 class ContactController extends BaseController 
 {
     private ContactRepository $contactRepository;
-    // ? private ContactService $contactService;
     
     public function __construct(ContactRepository $contactRepository) {
         $this->contactRepository = $contactRepository;
@@ -23,6 +22,7 @@ class ContactController extends BaseController
     
     /**
     * Controlador para manipular leitura de dados do banco
+    *
     * @param \Psr\Http\Message\ServerRequestInterface $request
     * @param \Psr\Http\Message\ResponseInterface $response
     * @return Response
@@ -47,7 +47,6 @@ class ContactController extends BaseController
     /**
      * 
      * Recupera um dado do banco com base no id passado na url (/contacts/{id})
-     * ! Pode ser colocado na camada de services ou em traits helper
      * 
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface $response
@@ -85,17 +84,15 @@ class ContactController extends BaseController
     */
     public function create(Request $request, Response $response): Response
     {
-        $request = $request->getBody()->getContents();                   // Capturando arquivo JSON da Stream de input (php://input)
-        $contactData = json_decode($request, true);   // Pega a requisicao e transforma em array assoc
-        
+        $params = $request->getParsedBody();                   // Capturando arquivo JSON da Stream de input (php://input) 
         // Validações de dados
-        if (!$this->validateDataFromRequest($contactData['contact'])){
+        if (!$this->validateDataFromRequest($params)){
             $payload = ['Error' => 'Dados invalidos']; 
             
             return $this->jsonResponse($response, $payload, 400);
         }
         
-        $contactOBJ = $this->hydrate($contactData['contact']);
+        $contactOBJ = $this->hydrate($params);
         
         // Salvando no Banco de Dados.
         $saveToDB = $this->contactRepository->create($contactOBJ);
