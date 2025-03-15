@@ -4,6 +4,7 @@ namespace Agenda\Repositories;
 
 use PDO;
 use Agenda\Entities\Contacts;
+use PDOException;
 
 class ContactRepository
 {
@@ -20,17 +21,22 @@ class ContactRepository
     * @param \Agenda\Entities\Contacts $contacts
     * @return bool
     */
-    public function create(Contacts $contacts): bool
+    public function create( $contacts): bool
     {
-        $stmt = $this->pdo->prepare(
-            'INSERT INTO contacts (name, phone_number, email, address) VALUES (:name, :phone_number, :email, :address);'
-        );
-        $stmt->bindValue(':name', $contacts->name);
-        $stmt->bindValue(':phone_number', $contacts->phone_number);
-        $stmt->bindValue(':email', $contacts->email);
-        $stmt->bindValue(':address', $contacts->address);
-        
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare(
+                'INSERT INTO contacts (name, phone_number, email, address) VALUES (:name, :phone_number, :email, :address);'
+            );
+            $stmt->bindValue(':name', $contacts->name);
+            $stmt->bindValue(':phone_number', $contacts->phone_number);
+            $stmt->bindValue(':email', $contacts->email);
+            $stmt->bindValue(':address', $contacts->address);
+            
+            return $stmt->execute();
+            
+        } catch (PDOException $e) {
+            return false;
+        }
     }
     
     
@@ -41,20 +47,24 @@ class ContactRepository
     */
     public function read(bool $associative = true): array|null
     {
-        $stmt = $this->pdo->query(
-            'SELECT * FROM contacts;'
-        );
-        
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($data)){
-            return null;
-        }
-        
-        if ($associative === true){
+        try {
+            $stmt = $this->pdo->query(
+                'SELECT * FROM contacts;'
+            );
+
+            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (empty($data)) {
+                return null;
+            }
+
+            if ($associative !== true) {
+                $dataAsObj = array_map($this->hydrate(...), $data);
+                return $dataAsObj;
+            }
+            
             return $data;
-        }else{
-            $dataAsObj = array_map($this->hydrate(...), $data);
-            return $dataAsObj;
+        } catch (PDOException $e) {
+            return null;
         }
     }
     
@@ -62,19 +72,28 @@ class ContactRepository
     
     public function readById(int $id, bool $associative = true): Contacts|array|null
     {
-        $stmt = $this->pdo->prepare(
-            'SELECT * FROM contacts WHERE id = :id;'
-        );
-        $stmt->bindValue(':id', $id);
-        $stmt->execute();
-        
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (empty($data)){
+        try {
+            $stmt = $this->pdo->prepare(
+                'SELECT * FROM contacts WHERE id = :id;'
+            );
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
+
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (empty($data)) {
+                return null;
+            }
+            
+            if ($associative === false){
+                $dataAsObj = $this->hydrate($data);
+                return $dataAsObj;
+            }
+
+            return $data;
+        } catch (PDOException $e) {
             return null;
         }
-        
-        return $data;
     }
     
     
@@ -85,17 +104,22 @@ class ContactRepository
     */
     public function update(Contacts $contacts): bool
     {
-        $stmt = $this->pdo->prepare(
-            'UPDATE contacts SET name = :name, phone_number = :phone_number, email = :email, address = :address WHERE id = :id;'
-        );
-        $stmt->bindValue(':name', $contacts->name);
-        $stmt->bindValue(':phone_number', $contacts->phone_number);
-        $stmt->bindValue(':email', $contacts->email);
-        $stmt->bindValue(':address', $contacts->address);
-        $stmt->bindValue(':id', $contacts->getId());
-        
-        return $stmt->execute();
-        
+        try {
+            $stmt = $this->pdo->prepare(
+                'UPDATE contacts SET name = :name, phone_number = :phone_number, email = :email, address = :address WHERE id = :id;'
+            );
+            $stmt->bindValue(':name', $contacts->name);
+            $stmt->bindValue(':phone_number', $contacts->phone_number);
+            $stmt->bindValue(':email', $contacts->email);
+            $stmt->bindValue(':address', $contacts->address);
+            $stmt->bindValue(':id', $contacts->getId());
+
+            return $stmt->execute();
+
+        } catch (PDOException $th) {
+            return false;
+        }
+
     }
     
     
@@ -104,14 +128,19 @@ class ContactRepository
     * @param int $id
     * @return bool
     */
-    public function delete(int $id)
+    public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare(
-            'DELETE FROM contacts WHERE id = :id;'
-        );
-        $stmt->bindValue(':id', $id);
-        
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare(
+                'DELETE FROM contacts WHERE id = :id;'
+            );
+            $stmt->bindValue(':id', $id);
+            
+            return $stmt->execute();
+            
+        } catch (PDOException $th) {
+            return false;
+        }
     }
     
     

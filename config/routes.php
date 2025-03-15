@@ -1,9 +1,12 @@
 <?php
 
+use Agenda\Middlewares\RequireApiKeyMiddleware;
 use Slim\App;
-use Agenda\Controllers\TestController;
 use Agenda\Controllers\Contacts\ContactController;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
+
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 
 return function(App $app) 
@@ -21,9 +24,6 @@ return function(App $app)
         
         // DELETE
         $group->delete('/{id}', [ContactController::class, 'delete']);
-
-    });
-
-
-    //==========================|Rotas de teste|=====================================//
+        
+    })->add(RequireApiKeyMiddleware::class);
 };
