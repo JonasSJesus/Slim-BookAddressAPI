@@ -153,8 +153,8 @@ class ContactRepository
     private function hydrate(array $data): Contacts
     {
         $contact = new Contacts($data['name'], $data['phone_number'], $data['email'], $data['address']);
-        $contact->setId($data['id']);
-        $contact->setCreatedAt($data['created_at']);
+        $contact->setId($data['id'])
+                ->setCreatedAt($data['created_at']);
         
         return $contact;
     }
