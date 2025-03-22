@@ -9,6 +9,7 @@ use Slim\Factory\AppFactory;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Inicializando .env
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
 
