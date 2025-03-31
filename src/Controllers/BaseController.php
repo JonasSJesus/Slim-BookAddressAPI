@@ -13,7 +13,7 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * Cria a resposta adequada, encodando os dados para json e inserindo no corpo da resposta.
-     * Também passa o status code e o Content-Type (apesar de configurar no middleware)
+     * Também passa o status code e o header Content-Type (apesar de configurar no middleware)
      * 
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param array $payload

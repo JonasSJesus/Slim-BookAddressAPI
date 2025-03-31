@@ -26,4 +26,12 @@ return function(App $app)
         $group->delete('/{id}', [ContactController::class, 'delete']);
         
     })->add(RequireApiKeyMiddleware::class);
+
+    // OPTIONS Coringa (aceito em qualquer endpoint)
+    $app->options('/{routes:.*}', function (Request $request, Response $response) {
+        return $response->withHeader('Access-Control-Allow-Origin', '*')
+                        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key')
+                        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                        ->withStatus(204); 
+    });
 };

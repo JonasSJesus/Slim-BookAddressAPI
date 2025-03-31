@@ -29,7 +29,7 @@ class RequireApiKeyMiddleware implements MiddlewareInterface
         $savedKey = $_ENV['API_SAVED_USER_KEY']; // Hash da chave publica "salva no banco" 
 
         $userKey = $request->getHeaderLine('X-API-Key');
-        $hashedKey = hash_hmac('sha256', $userKey, $_ENV['API_SECRET_KEY']);
+        $hashedKey = hash_hmac('sha256', $userKey, $_ENV['API_SECRET_KEY']); // Cria um token com base na chave
 
         if ($hashedKey !== $savedKey){
             $response = $this->responseFactory->createResponse();
